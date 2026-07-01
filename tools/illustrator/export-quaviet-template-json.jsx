@@ -260,7 +260,25 @@
   }
 
   function isoNow() {
-    return new Date().toISOString();
+    var date = new Date();
+    return (
+      date.getUTCFullYear() +
+      "-" +
+      pad2(date.getUTCMonth() + 1) +
+      "-" +
+      pad2(date.getUTCDate()) +
+      "T" +
+      pad2(date.getUTCHours()) +
+      ":" +
+      pad2(date.getUTCMinutes()) +
+      ":" +
+      pad2(date.getUTCSeconds()) +
+      ".000Z"
+    );
+  }
+
+  function pad2(value) {
+    return value < 10 ? "0" + value : String(value);
   }
 
   function stringify(value, depth) {
