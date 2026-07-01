@@ -6,6 +6,7 @@ import { templates } from "@/data/templates";
 import type { ColorPalette, DesignAsset, FontOption, Product, Template } from "@/lib/types";
 import { createSupabaseAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin-client";
 import { applyTemplateAdjustments } from "@/lib/store/templateAdjustmentRepository";
+import { listImportedProducts, listImportedTemplates } from "@/lib/store/importedCatalogRepository";
 
 function mapProductRow(row: Record<string, unknown>): Product {
   return {
@@ -68,11 +69,13 @@ async function trySupabase<T>(loader: () => Promise<T[]>, fallback: T[]): Promis
 }
 
 export async function listProducts(): Promise<Product[]> {
-  return trySupabase(async () => {
+  const loaded = await trySupabase(async () => {
     const { data, error } = await createSupabaseAdminClient().from("products").select("*").eq("is_active", true).order("created_at");
     if (error) throw error;
     return (data ?? []).map(mapProductRow);
   }, products);
+  const imported = await listImportedProducts();
+  return [...imported, ...loaded.filter((product) => !imported.some((item) => item.sku === product.sku))];
 }
 
 export async function getProductBySku(sku: string): Promise<Product | undefined> {
@@ -87,7 +90,8 @@ export async function listTemplates(sku?: string): Promise<Template[]> {
     if (error) throw error;
     return (data ?? []).map(mapTemplateRow);
   }, sku ? templates.filter((template) => template.sku === sku) : templates);
-  return applyTemplateAdjustments(loaded);
+  const imported = (await listImportedTemplates()).filter((template) => !sku || template.sku === sku);
+  return applyTemplateAdjustments([...imported, ...loaded.filter((template) => !imported.some((item) => item.sku === template.sku || item.id === template.id))]);
 }
 
 export async function getTemplateById(id: string): Promise<Template | undefined> {

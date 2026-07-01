@@ -1,4 +1,6 @@
 export const localStorePath = "data/personalizations.json";
+export const importedProductsPath = "data/imported-products.json";
+export const importedTemplatesPath = "data/imported-templates.json";
 export const templateAdjustmentDir = "data/template-adjustments";
 
 export function templateAdjustmentPath(sku: string): string {

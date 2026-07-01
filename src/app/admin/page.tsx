@@ -12,9 +12,14 @@ export default async function AdminPage() {
         <div className="mx-auto max-w-7xl px-5 py-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-2xl font-bold text-[#251f18]">Personalization Admin</h1>
-            <Link href="/admin/calibration" className="rounded-md border border-[#cfc7b8] bg-white px-4 py-2 text-sm font-bold text-[#251f18] transition hover:border-[#b08a3e]">
-              Template Calibrator
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/admin/import-product" className="rounded-md border border-[#cfc7b8] bg-white px-4 py-2 text-sm font-bold text-[#251f18] transition hover:border-[#b08a3e]">
+                Import Product
+              </Link>
+              <Link href="/admin/calibration" className="rounded-md border border-[#cfc7b8] bg-white px-4 py-2 text-sm font-bold text-[#251f18] transition hover:border-[#b08a3e]">
+                Template Calibrator
+              </Link>
+            </div>
           </div>
           <p className="mt-2 rounded-md border border-[#d6a94d] bg-[#fff4d6] px-3 py-2 text-sm font-semibold text-[#6f4a00]">
             Admin page is unsecured in MVP. Add Supabase Auth or another access control before production.
