@@ -1,0 +1,13 @@
+.next
+node_modules
+npm-debug.log
+Dockerfile
+.git
+.DS_Store
+.deploy-keys
+CODEX_PROMPT*.md
+quaviet-personalization-codex-kit.zip
+quaviet-coolify-supabase-addon.zip
+quaviet-personalization-codex-kit
+quaviet-coolify-supabase-addon
+data/*.json

@@ -1,0 +1,14 @@
+.next/
+node_modules/
+.npm-cache/
+.pw-browsers/
+.deploy-keys/
+data/personalizations.json
+.env
+.env*.local
+*.log
+.DS_Store
+*.zip
+CODEX_PROMPT*.md
+quaviet-personalization-codex-kit/
+quaviet-coolify-supabase-addon/
