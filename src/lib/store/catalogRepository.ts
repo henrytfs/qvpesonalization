@@ -5,6 +5,7 @@ import { products } from "@/data/products";
 import { templates } from "@/data/templates";
 import type { ColorPalette, DesignAsset, FontOption, Product, Template } from "@/lib/types";
 import { createSupabaseAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin-client";
+import { applyTemplateAdjustments } from "@/lib/store/templateAdjustmentRepository";
 
 function mapProductRow(row: Record<string, unknown>): Product {
   return {
@@ -79,13 +80,14 @@ export async function getProductBySku(sku: string): Promise<Product | undefined>
 }
 
 export async function listTemplates(sku?: string): Promise<Template[]> {
-  return trySupabase(async () => {
+  const loaded = await trySupabase(async () => {
     let query = createSupabaseAdminClient().from("templates").select("*").eq("is_active", true).order("created_at");
     if (sku) query = query.eq("sku", sku);
     const { data, error } = await query;
     if (error) throw error;
     return (data ?? []).map(mapTemplateRow);
   }, sku ? templates.filter((template) => template.sku === sku) : templates);
+  return applyTemplateAdjustments(loaded);
 }
 
 export async function getTemplateById(id: string): Promise<Template | undefined> {

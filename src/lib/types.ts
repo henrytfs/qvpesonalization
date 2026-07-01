@@ -107,6 +107,17 @@ export interface Template {
   productionNotes?: string[];
 }
 
+export interface TemplateAdjustment {
+  version: 1;
+  sku: string;
+  templateId: string;
+  mockupImageUrl?: string;
+  previewCanvas?: PreviewCanvas;
+  surfaces?: EditableSurface[];
+  fields?: TemplateField[];
+  updatedAt: string;
+}
+
 export interface ColorPalette {
   id: string;
   name: string;
