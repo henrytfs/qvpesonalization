@@ -14,3 +14,5 @@ This app is built as a standalone Next.js service for a domain such as `https://
 10. Deploy and check `/api/health`.
 
 The app uses `next.config.mjs` standalone output for the Docker runtime.
+
+If deployment logs show Coolify running `nixpacks plan ... --build-cmd 'npm build'`, the Coolify dashboard Build Command is overriding this repository's `nixpacks.toml`. `npm build` is not a valid npm command for this app and cannot be fixed from package scripts; update the Coolify Build Command to `npm run build`.
