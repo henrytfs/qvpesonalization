@@ -89,6 +89,12 @@ export interface TemplateField {
   startAngle?: number;
   endAngle?: number;
   arcPosition?: "top" | "bottom";
+  realXmm?: number;
+  realYmm?: number;
+  realWidthMm?: number;
+  realHeightMm?: number;
+  realFontSizeMm?: number;
+  realRadiusMm?: number;
 }
 
 export interface Template {

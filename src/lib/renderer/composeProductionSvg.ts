@@ -31,39 +31,50 @@ function fontFamily(field: TemplateField, state: PersonalizationState, template:
 function renderText(field: TemplateField, state: PersonalizationState, template: Template, surface: EditableSurface, palette: ColorPalette) {
   const value = state.fieldValues[field.id] ?? field.defaultValue ?? "";
   const pos = previewToSurfaceMm(surface, field.x, field.y);
-  const width = field.width ? previewSizeToSurfaceMm(surface, field.width, 0).width : undefined;
-  const size = ((state.fieldSizeOverrides[field.id] ?? field.fontSize ?? 20) / surfaceBounds(surface).height) * surfaceSizeMm(surface).height;
+  const width = field.realWidthMm ?? (field.width ? previewSizeToSurfaceMm(surface, field.width, 0).width : undefined);
+  const size = state.fieldSizeOverrides[field.id]
+    ? (state.fieldSizeOverrides[field.id] / surfaceBounds(surface).height) * surfaceSizeMm(surface).height
+    : field.realFontSizeMm ?? ((field.fontSize ?? 20) / surfaceBounds(surface).height) * surfaceSizeMm(surface).height;
   const color = tokenColor(palette, state.fieldColorTokenOverrides[field.id] ?? field.colorToken);
-  const x = field.align === "left" && width ? pos.x - width / 2 : field.align === "right" && width ? pos.x + width / 2 : pos.x;
+  const centerX = field.realXmm ?? pos.x;
+  const y = field.realYmm ?? pos.y;
+  const x = field.align === "left" && width ? centerX - width / 2 : field.align === "right" && width ? centerX + width / 2 : centerX;
   const lines = splitTextIntoLines(value, width ? Math.max(10, Math.floor(width / (size * 0.42))) : 36);
-  return `<text x="${x.toFixed(2)}" y="${pos.y.toFixed(2)}" text-anchor="${textAnchor(field.align)}" font-family="${escapeAttribute(fontFamily(field, state, template))}" font-size="${size.toFixed(2)}" font-weight="${field.fontWeight ?? "400"}" fill="${color}">
+  return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" text-anchor="${textAnchor(field.align)}" font-family="${escapeAttribute(fontFamily(field, state, template))}" font-size="${size.toFixed(2)}" font-weight="${field.fontWeight ?? "400"}" fill="${color}">
     ${lines.map((line, index) => `<tspan x="${x.toFixed(2)}" dy="${index === 0 ? 0 : (size * 1.18).toFixed(2)}">${escapeXml(line)}</tspan>`).join("")}
   </text>`;
 }
 
 function renderLogo(field: TemplateField, state: PersonalizationState, surface: EditableSurface) {
   const pos = previewToSurfaceMm(surface, field.x, field.y);
-  const size = previewSizeToSurfaceMm(surface, field.width ?? 120, field.height ?? 60);
+  const size = {
+    width: field.realWidthMm ?? previewSizeToSurfaceMm(surface, field.width ?? 120, 0).width,
+    height: field.realHeightMm ?? previewSizeToSurfaceMm(surface, 0, field.height ?? 60).height,
+  };
   const href = state.logoStoragePath ? `supabase://${state.logoStoragePath}` : state.logoDataUrl;
   if (!href) {
     return `<!-- Optional logo omitted -->`;
   }
-  return `<!-- TODO: sanitize uploaded SVG/PDF/AI-derived logos before production path conversion. --><image href="${escapeAttribute(href)}" x="${pos.x.toFixed(2)}" y="${pos.y.toFixed(2)}" width="${size.width.toFixed(2)}" height="${size.height.toFixed(2)}" preserveAspectRatio="xMidYMid meet"/>`;
+  return `<!-- TODO: sanitize uploaded SVG/PDF/AI-derived logos before production path conversion. --><image href="${escapeAttribute(href)}" x="${(field.realXmm ?? pos.x).toFixed(2)}" y="${(field.realYmm ?? pos.y).toFixed(2)}" width="${size.width.toFixed(2)}" height="${size.height.toFixed(2)}" preserveAspectRatio="xMidYMid meet"/>`;
 }
 
 function renderTextArc(field: TemplateField, state: PersonalizationState, template: Template, surface: EditableSurface, palette: ColorPalette) {
   const center = previewToSurfaceMm(surface, field.x, field.y);
-  const radius = previewSizeToSurfaceMm(surface, field.radius ?? 120, field.radius ?? 120).width;
+  const radius = field.realRadiusMm ?? previewSizeToSurfaceMm(surface, field.radius ?? 120, field.radius ?? 120).width;
   const start = ((field.startAngle ?? 200) * Math.PI) / 180;
   const end = ((field.endAngle ?? 340) * Math.PI) / 180;
-  const x1 = center.x + radius * Math.cos(start);
-  const y1 = center.y + radius * Math.sin(start);
-  const x2 = center.x + radius * Math.cos(end);
-  const y2 = center.y + radius * Math.sin(end);
+  const centerX = field.realXmm ?? center.x;
+  const centerY = field.realYmm ?? center.y;
+  const x1 = centerX + radius * Math.cos(start);
+  const y1 = centerY + radius * Math.sin(start);
+  const x2 = centerX + radius * Math.cos(end);
+  const y2 = centerY + radius * Math.sin(end);
   const largeArc = Math.abs((field.endAngle ?? 340) - (field.startAngle ?? 200)) > 180 ? 1 : 0;
   const sweep = field.arcPosition === "bottom" ? 0 : 1;
   const pathId = `${state.id}-${field.id}-production-arc`;
-  const size = ((state.fieldSizeOverrides[field.id] ?? field.fontSize ?? 18) / surfaceBounds(surface).height) * surfaceSizeMm(surface).height;
+  const size = state.fieldSizeOverrides[field.id]
+    ? (state.fieldSizeOverrides[field.id] / surfaceBounds(surface).height) * surfaceSizeMm(surface).height
+    : field.realFontSizeMm ?? ((field.fontSize ?? 18) / surfaceBounds(surface).height) * surfaceSizeMm(surface).height;
   const color = tokenColor(palette, state.fieldColorTokenOverrides[field.id] ?? field.colorToken);
   const value = state.fieldValues[field.id] ?? field.defaultValue ?? "";
   return `
