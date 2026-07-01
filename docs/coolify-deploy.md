@@ -8,7 +8,7 @@ This app is built as a standalone Next.js service for a domain such as `https://
 4. Create a Coolify app from this repository.
 5. Use Node `22.13.0` or newer.
 6. Set Build Command to `npm run build`.
-7. Set Start Command to `npm start`.
+7. Set Start Command to `npm start`; the package script binds the Next production server to `0.0.0.0:3000`.
 8. Use the included `Dockerfile` if choosing Docker-based deployment; do not pass secret Supabase keys as build arguments.
 9. Add the variables from `.env.example` in Coolify runtime environment settings.
 10. Deploy and check `/api/health`.
